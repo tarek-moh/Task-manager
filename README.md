@@ -59,11 +59,5 @@ cd task-manager
 dotnet restore
 dotnet run
 ```
-2.Open your browser and navigate to https://localhost:5001.
-
-### Key Sections:
-
-- **Prerequisites**: Lists SQL Server, SSMS, and .NET Core SDK as the only requirements.
-- **Database Setup**: Clear instructions for creating the database and executing the SQL script via SSMS.
-- **Connection String Configuration**: A simple explanation for editing `appsettings.json`.
-- **Running the Application**: Simple steps to run the application using .NET Core.
+2. Navigate to the link provided after runing the command. eg: https://localhost:1000/
+3. login with the admin account email: admin@Task-manager.com    password: verySecret
