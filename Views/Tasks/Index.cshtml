@@ -1,0 +1,160 @@
+﻿@{
+	ViewData["Title"] = "Task List";
+}
+
+<title>@ViewData["Title"] -  </title>
+
+@model List<Task_Manager.Models.Task>
+
+@{
+    ViewData["Title"] = "Tasks Page";
+}
+
+<div class="container">
+    <form method="get" action="@Url.Action("Search")">
+        <div class="row align-items-center mb-3">
+            <div class="col-md-6">
+                <!-- Search input and button -->
+                <div class="input-group">
+                    <input type="text" name="id" class="form-control" style="width:300px" placeholder="Search for tasks by employee's ID" />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 text-right">
+                <!-- Add task button -->
+                <a asp-action="add" class="btn btn-primary">Add a task</a>
+            </div>
+        </div>
+    </form>
+    <form method="get" action="@Url.Action("index")">
+        <div class="row align-items-center">
+            <div class="col-md-12 d-flex justify-content-start">
+                <!-- Filtering Form for Status and Priority -->
+                @using (Html.BeginForm("Index", "Tasks", FormMethod.Get, new { @class = "form-inline" }))
+                {
+                    <div class="form-group mr-2">
+                        <label for="status" class="sr-only">Status</label>
+                        @Html.DropDownList("Status", new SelectList(new[] { "All", "Pending", "in Progress", "Completed" }),"Status", new { @class = "form-control form-control-sm", @id = "status" })
+                    </div>
+
+                    <div class="form-group mr-2">
+                        <label for="priority" class="sr-only">Priority</label>
+                        @Html.DropDownList("Priority",
+                                 new SelectList(
+                                 new List<SelectListItem>
+                                {
+                        new SelectListItem { Text = "All", Value = "0" },
+                        new SelectListItem { Text = "High", Value = "1" },
+                        new SelectListItem { Text = "Medium", Value = "2" },
+                        new SelectListItem { Text = "Low", Value = "3" }
+                        }, "Value", "Text"), "Priority", new { @class = "form-control form-control-sm" })
+                    </div>
+
+                    <!-- Filter button with same width as dropdowns -->
+                    <button type="submit" class="btn btn-primary btn-sm form-control form-control-sm" style="width: auto;">Filter</button>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Styling for table */
+    .custom-table {
+        width: 100%;
+        table-layout: auto; /* Auto layout to allow content to define width */
+        border-collapse: collapse; /* Merge borders for a cleaner look */
+    }
+
+        .custom-table th, .custom-table td {
+            padding: 8px 12px; /* Adjust padding for compactness */
+            text-align: center;
+            border: 1px solid #ddd; /* Light border for a cleaner look */
+            white-space: normal; /* Allows text to wrap */
+        }
+
+        .custom-table th {
+            background-color: #007bff; /* Twitter Blue for header */
+            color: white;
+            font-weight: bold;
+        }
+
+        .custom-table td {
+            background-color: #f9f9f9; /* Light background for rows */
+        }
+
+        /* Row hover effect for better UX */
+        .custom-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Column width adjustments */
+        .custom-table th:nth-child(1),
+        .custom-table td:nth-child(1) {
+            width: 50px;
+        }
+        /* ID column */
+
+        .custom-table th:nth-child(2),
+        .custom-table td:nth-child(2) {
+            width: 150px;
+        }
+        /* Name */
+
+        .custom-table th:nth-child(6),
+        .custom-table td:nth-child(6) {
+            width: 100px;
+        }
+        /* Employee ID */
+
+        .custom-table th:nth-child(7),
+        .custom-table td:nth-child(7) {
+            width: 200px;
+        }
+    /* Actions */
+</style>
+
+<div class="container mt-4">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Employee ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@task.Id</td>
+                    <td>@task.Name</td>
+                    <td>@task.DueDate.ToString("yyyy-MM-dd")</td>
+                    <td>@task.Status</td>
+                    <td>
+                        @(
+                            task.Priority == 1 ? "High" :
+                            task.Priority == 2 ? "Medium" :
+                            "Low"
+                            )
+                    </td>
+                    <td>@task.EmployeeId</td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-outline-info">Details</a>
+                            <a asp-action="Delete" asp-controller="Tasks" asp-route-id="@task.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

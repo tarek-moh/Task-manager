@@ -1,0 +1,59 @@
+﻿@model Task_Manager.Models.Task
+
+@{
+	ViewBag.Title = "Edit task";
+}
+
+<!-- columns: Title, Description, Due date, status, priority, Employee ID	-->
+
+@using (Html.BeginForm("edit", "Tasks", FormMethod.Post))
+{
+        <!-- Hidden field for the task ID -->
+    @Html.HiddenFor(model => model.Id)
+
+    <!-- Task Name -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name)
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+    </div>
+
+    <!-- Task Description -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description)
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4 })
+    </div>
+
+    <!-- Due Date -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.DueDate)
+        @Html.TextBoxFor(model => model.DueDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+    </div>
+
+    <!-- Status -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.Status)
+        @Html.DropDownListFor(model => model.Status, new SelectList(new[] { "Pending","in Progress" ,"Completed" }), new { @class = "form-control" })
+    </div>
+
+    <!-- Priority -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.Priority)
+        @Html.DropDownListFor(model => model.Priority, new List<SelectListItem>
+    {
+    new SelectListItem { Text = "High", Value = "1" },
+    new SelectListItem { Text = "Medium", Value = "2" },
+    new SelectListItem { Text = "Low", Value = "3" }
+    }, new { @class = "form-control" })
+    </div>
+
+    <!-- Employee ID -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.EmployeeId)
+        @Html.TextBoxFor(model => model.EmployeeId, new { @class = "form-control" })
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+}

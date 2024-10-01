@@ -1,0 +1,57 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Home Page";
+}
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.2/main.min.css" />
+</head>
+
+<body>
+<div class="container mt-4">
+
+    <h2>Statistics</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Total Tasks: <span id="totalTasks">100</span></h3>
+        </div>
+        <div class="col-md-4">
+            <h3>Tasks Due Today: <span id="tasksDueToday">5</span></h3>
+        </div>
+        <div class="col-md-4">
+            <h3>Completed Tasks: <span id="completedTasks">50</span></h3>
+        </div>
+    </div>
+        <style>
+            #calendar {
+                height: 600px; /* Adjust the height here */
+            }</style>
+    <div id="calendar" class="border p-3"></div>
+</div>
+
+    <div id="calendar">
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.2/main.min.js"></script>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+
+            },
+            
+            events: [
+                { title: 'Task 1', start: '2024-09-25' },
+                { title: 'Task 2', start: '2024-09-26', end: '2024-09-27' },
+                { title: 'Task 3', start: '2024-09-28' }
+            ]
+        });
+        calendar.render();
+    });
+</script>

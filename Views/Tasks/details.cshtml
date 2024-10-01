@@ -1,0 +1,48 @@
+﻿@model Task_Manager.Models.Task
+
+<h2>Task Details</h2>
+
+<!-- Task details section -->
+<div>
+    <p><strong>Name:</strong> @Model.Name</p>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Due Date:</strong> @Model.DueDate.ToShortDateString()</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+    <p><strong>Priority:</strong> @Model.Priority</p>
+    <p><strong>Employee ID:</strong> @Model.EmployeeId</p>
+</div>
+
+<hr />
+
+<!-- Comments section -->
+<h3>Comments</h3>
+<ul>
+    @if(Model.comments!=null){
+        foreach (var comment in Model.comments)
+        {
+            <li>@comment.commentText (@comment.createdDate.ToShortDateString())</li>
+        }
+    }
+
+</ul>
+
+<hr />
+
+<!-- Add Comment Form -->
+@using (Html.BeginForm("AddComment", "Tasks", FormMethod.Post))
+{
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Name)
+    @Html.HiddenFor(model => model.Description)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.Priority)
+    @Html.HiddenFor(model => model.DueDate)
+    @Html.HiddenFor(model => model.comments)
+    @Html.HiddenFor(model => model.EmployeeId)
+
+    <div class="form-group">
+        @Html.TextAreaFor(model => model.NewCommentText, new { @class = "form-control", placeholder = "Enter your comment here..." })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Comment</button>
+}
