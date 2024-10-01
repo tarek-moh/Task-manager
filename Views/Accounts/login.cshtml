@@ -1,0 +1,83 @@
+﻿@model Task_Manager.Models.account
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null; // Use null to avoid the layout being applied
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .login-container h2 {
+                margin-bottom: 20px;
+            }
+
+        .modal-body .form-group {
+            margin-bottom: 1rem; /* Consistent spacing between fields */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="text-center">Login</h2>
+        @using (Html.BeginForm("Login", "Accounts", FormMethod.Post))
+        {
+            @if (TempData["valid"] == "false")
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Html.ValidationSummary(false, "Incorrect email or password", new { @class = "text-danger" })
+                </div>
+            }
+
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                @Html.LabelFor(m => m.email)
+                @Html.TextBoxFor(m => m.email, new { @class = "form-control", placeholder = "Email" })
+                @Html.ValidationMessageFor(m => m.email)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.password)
+                @Html.PasswordFor(m => m.password, new { @class = "form-control", placeholder = "Password" })
+                @Html.ValidationMessageFor(m => m.password)
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        }
+
+        <div class="text-center mt-3">
+            <a asp-action="ChangePassword" asp-controller="Accounts" class="btn btn-link">Change Password</a>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

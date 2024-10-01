@@ -1,0 +1,12 @@
+﻿# Ignore Visual Studio temporary files, build results, and
+# build directories
+*.log
+*.user
+*.vscode/
+*.vs/
+bin/
+obj/
+
+# Ignore secrets and configuration files
+appsettings.json
+appsettings.Development.json
