@@ -1,4 +1,4 @@
-# Task Manager Project
+# Task Manager Website
 
 This is a web-based task management system built with ASP.NET Core and SQL Server. The application allows users to manage tasks, assign them to employees, and track their progress.
 
