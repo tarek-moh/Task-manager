@@ -37,7 +37,7 @@ cd task-manager
 2. Connect to your local SQL Server instance (e.g., (local)\local, localhost, etc.)
    -make sure this is the same as the servername in the connections string in appsettings.json file
 3. In the Object Explorer, right-click on Databases and select New Database...
-   -Name the database TaskManagerDB.
+   -Name the database "Task Manager".
 4.Open the TaskManagerDB_Script.sql file, located in the Database/ folder of this repository.
    -In SSMS, go to File > Open > File and select the TaskManagerDB_Script.sql file.
 5. Execute the SQL script by clicking the Execute button (or pressing F5).
