@@ -60,4 +60,6 @@ dotnet restore
 dotnet run
 ```
 2. Navigate to the link provided after runing the command. eg: https://localhost:1000/
-3. login with the admin account email: admin@Task-manager.com    password: verySecret
+3. login with the admin account
+```bash
+ email: admin@Task-manager.com    password: verySecret
