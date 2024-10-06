@@ -24,7 +24,7 @@ namespace Task_Manager.Controllers
         public async Task<IActionResult> Login(Task_Manager.Models.account account)
         {
             string hash = await _DAL.GetHashedPassword(account.email);
-            if(hash != null && BC.Verify(account.password, hash))
+            if(hash != null && account.password != null && BC.Verify(account.password, hash))
             {
                 Task_Manager.Models.Employee employee = await _DAL.GetEmployeeByEmail(account.email);
 
