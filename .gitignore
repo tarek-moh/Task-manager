@@ -10,3 +10,4 @@ obj/
 # Ignore secrets and configuration files
 appsettings.json
 appsettings.Development.json
+Database/script.sql
