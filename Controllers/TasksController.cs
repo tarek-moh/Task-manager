@@ -9,7 +9,11 @@ namespace Task_Manager.Controllers
     [SessionAuthorize]
     public class TasksController : Controller
     {
-        TaskManagerDAL _DAL = new TaskManagerDAL();
+        private readonly TaskManagerDAL _DAL;
+        public TasksController(TaskManagerDAL dal)
+        {
+            _DAL = dal;
+        }
         public ActionResult Index(int priority = 0, string status = "All")
         {
             List<Task_Manager.Models.Task> tasks;

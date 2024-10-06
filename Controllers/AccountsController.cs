@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Task_Manager.Models;
 using BC = BCrypt.Net.BCrypt;
@@ -7,7 +8,11 @@ namespace Task_Manager.Controllers
 {
     public class AccountsController : Controller
     {
-        TaskManagerDAL _DAL = new TaskManagerDAL();
+        private readonly TaskManagerDAL _DAL;
+        public AccountsController(TaskManagerDAL dal)
+        {
+            _DAL = dal;
+        }
         [HttpGet]
         public IActionResult Login()
         {
@@ -23,7 +28,15 @@ namespace Task_Manager.Controllers
             {
                 Task_Manager.Models.Employee employee = await _DAL.GetEmployeeByEmail(account.email);
 
-                string isManger = _DAL.isManager(employee.Id, employee.DepartmentId).ToString().ToLower();
+                string isManger;
+                if (employee.DepartmentId == null)
+                {
+                    isManger = "false";
+                }
+                else
+                {
+                    isManger = _DAL.isManager(employee.Id, employee.DepartmentId).ToString().ToLower();
+                }
 
                 //save the rest of employee Data in the future
 
@@ -67,6 +80,8 @@ namespace Task_Manager.Controllers
 
         public ActionResult Add()
         {
+            var departments = _DAL.GetDepartmentList();
+            ViewBag.Departments = new SelectList(departments, "Id", "Name"); 
             return View();
         }
 
@@ -75,6 +90,7 @@ namespace Task_Manager.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 if (_DAL.isEmployeeExist(employee.Email))
                 { 
                     ModelState.AddModelError("Email", "An employee with this email already exists.");
@@ -82,11 +98,12 @@ namespace Task_Manager.Controllers
                 else
                 {
                     _DAL.AddEmployee(employee);
-                    return RedirectToAction("Index", "Tasks");
+                    return RedirectToAction("List", "Employees");
                 }
 
             }
-
+            var departments = _DAL.GetDepartmentList();
+            ViewBag.Departments = new SelectList(departments, "Id", "Name");
             return View(employee);
         }
 

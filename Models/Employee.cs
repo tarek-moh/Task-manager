@@ -30,5 +30,5 @@ public class Employee
     public string PassWord {  get; set; }
     [Required(ErrorMessage = "Department ID is required!")]
     [Display(Name = "Department ID")]
-    public int DepartmentId {  get; set; }
+    public int? DepartmentId {  get; set; }
 }

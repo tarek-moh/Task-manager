@@ -1,0 +1,46 @@
+﻿@using Task_Manager.Models
+@model departments
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Department List</h2>
+    <a asp-controller="Departments" asp-action="Add" class="btn btn-primary">Add Department</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Department Name</th>
+            <th>Department Head</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var department in Model.departmentList)
+
+        {
+        <tr>
+            <td>@department.Name</td>
+            <td>
+                <!-- Form for each department -->
+                @using (Html.BeginForm("UpdateDepartmentHead", "Departments", FormMethod.Post))
+                    {
+                        <!-- Correctly bind department ID -->
+                @Html.Hidden("Id", department.Id)
+
+ <!-- Correctly bind headID -->
+                @Html.DropDownList("headID",
+                         new SelectList(Model.employees, "Value", "Text", department.headID),
+                         new
+                         {
+
+                             @class = "form-control",
+
+                             onchange = "this.form.submit();" // Submit the form when the dropdown changes
+                         }
+                         )
+                    }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

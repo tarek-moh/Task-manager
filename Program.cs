@@ -2,6 +2,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddScoped<TaskManagerDAL>(provider =>
+{
+    var configuration = provider.GetService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    return new TaskManagerDAL(connectionString);
+});
+
 builder.Services.AddHttpContextAccessor(); // Needed to access HttpContext
 builder.Services.AddControllersWithViews();
 

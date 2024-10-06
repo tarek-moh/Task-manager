@@ -94,24 +94,31 @@
         <header>
             <nav class="navbar navbar-expand-sm navbar-dark sticky-top">
                 <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Task Manager</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Tasks" asp-action="Index">Task Manager</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Tasks" asp-action="Index">Tasks</a>
+                                <a class="btn btn-primary" asp-controller="Tasks" asp-action="Index">Tasks</a>
                             </li>
                             <li class="nav-item">
                                 @if (TempData.Peek("isAdmin") != null && TempData.Peek("isAdmin").ToString() == "true")
                                 {
-                                    <a asp-controller="Accounts" asp-action="Add" class="btn btn-primary">Add an employee</a>
+                                    <a asp-controller="Employees" asp-action="List" class="btn btn-primary" style="margin-left: 10px;">Employees</a>
+                                }
+                            </li>
+                            <li class="nav-item">
+                                @if (TempData.Peek("isAdmin") != null && TempData.Peek("isAdmin").ToString() == "true")
+                                {
+                                    <a asp-controller="Departments" asp-action="Index" class="btn btn-primary" style="margin-left: 10px;">departments</a>
                                 }
                             </li>
                         </ul>
                         <div class="navbar-text greeting">
-                            Hello, @TempData.Peek("fName")!
+                            Hello, @TempData.Peek("fName")! ID: @TempData.Peek("myId")
+
                         </div>
                         <a asp-controller="Accounts" asp-action="Logout" class="btn btn-outline-light">Logout</a>
                     </div>
@@ -130,7 +137,7 @@
     {
         <footer class="footer text-center mt-auto">
             <div class="container">
-                &copy; 2024 - Task Manager <a asp-area="" asp-controller="Home">Home</a>
+                &copy; 2024 - Task Manager
             </div>
         </footer>
     }

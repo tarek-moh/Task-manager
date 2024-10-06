@@ -3,14 +3,20 @@ using System.Data;
 using Task_Manager.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BC = BCrypt.Net.BCrypt;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using Task_Manager.Controllers;
 
 
 public class TaskManagerDAL
 {
     private string _connectionString = "Server=(localdb)\\local;Database=Task Manager;Trusted_Connection=True";
     private string _commandString = null;
+
+    public TaskManagerDAL(string connectionString)
+    {
+        _connectionString = connectionString;
+    }
 
     public static IConfiguration Configuration { get; set; }
 
@@ -23,17 +29,15 @@ public class TaskManagerDAL
 
     public List<Task_Manager.Models.Task> getTasksList()
     {
-        //_connectionString = getConnectionString();
-
 
         List<Task_Manager.Models.Task> tasks = new List<Task_Manager.Models.Task>();
         using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
         {
             sqlConnection.Open();
-            
+
             try
-            {   
-             
+            {
+
                 using (SqlCommand cmd = new SqlCommand("SELECT * FROM TASK", sqlConnection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -81,10 +85,10 @@ public class TaskManagerDAL
                 " FROM Task t " +
                 "LEFT JOIN Employee e ON (e.employeeID = t.employeeID)" +
                 " WHERE t.employeeID = @employeeId OR e.supervisorID = @employeeId OR e.departmentID = @departmentID";
-       
+
             try
-            { 
-                using (SqlCommand cmd = new SqlCommand(sqlString, sqlConnection)) 
+            {
+                using (SqlCommand cmd = new SqlCommand(sqlString, sqlConnection))
                 {
 
                     cmd.Parameters.AddWithValue("@employeeId", Id);
@@ -440,7 +444,8 @@ public class TaskManagerDAL
         return hash;
     }
 
-    public void ChangePassword(string email, string password) {
+    public void ChangePassword(string email, string password)
+    {
         try
         {
             using (SqlConnection _connection = new SqlConnection(_connectionString))
@@ -462,7 +467,6 @@ public class TaskManagerDAL
         }
     }
 
-
     public bool isEmployeeExist(string email)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -477,10 +481,10 @@ public class TaskManagerDAL
 
             return count > 0;
         }
-        
+
     }
 
-    public bool isManager(int? empId, int depId)
+    public bool isManager(int? empId, int? depId)
     {
         string cmdString = "SELECT headID FROM Department WHERE departmentID = @departmentID";
 
@@ -526,7 +530,7 @@ public class TaskManagerDAL
 
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read()) 
+                        if (reader.Read())
                         {
                             return (bool)reader["isAdmin"];
                         }
@@ -543,7 +547,7 @@ public class TaskManagerDAL
 
     public async void AddEmployee(Task_Manager.Models.Employee employee)
     {
-        
+
         try
         {
             using (SqlConnection _connection = new SqlConnection(_connectionString))
@@ -576,7 +580,53 @@ public class TaskManagerDAL
         }
     }
 
-    public async Task<Task_Manager.Models.Employee> GetEmployeeByEmail (string email)
+    public async Task<bool> DeleteEmployeeAndUpdateTasksAsync(int employeeId)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        var updateTasksQuery = "UPDATE Task SET employeeID = @default WHERE employeeID = @employeeID";
+                        using (SqlCommand updateCommand = new SqlCommand(updateTasksQuery, connection, transaction))
+                        {
+                            updateCommand.Parameters.AddWithValue("@default", 1); 
+                            updateCommand.Parameters.AddWithValue("@employeeID", employeeId);
+                            await updateCommand.ExecuteNonQueryAsync();
+                        }
+
+                        var deleteEmployeeQuery = "DELETE FROM Employee WHERE employeeID = @employeeID";
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteEmployeeQuery, connection, transaction))
+                        {
+                            deleteCommand.Parameters.AddWithValue("@EmployeeId", employeeId);
+                            await deleteCommand.ExecuteNonQueryAsync();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Console.WriteLine($"Error occurred while deleting employee: {ex.Message}");
+                        return false; 
+                    }
+                }
+            }
+            return true; 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Database connection error: {ex.Message}");
+            return false; 
+        }
+    }
+
+    public async Task<Task_Manager.Models.Employee> GetEmployeeByEmail(string email)
     {
         Task_Manager.Models.Employee employee = new Task_Manager.Models.Employee();
         try
@@ -597,10 +647,10 @@ public class TaskManagerDAL
                             employee.FirstName = reader["fName"].ToString();
                             employee.LastName = reader["lName"].ToString();
                             employee.Age = (reader["age"] == DBNull.Value) ? null : (int)reader["age"];
-                            employee.phone = (reader["phone"] == DBNull.Value) ? null: reader["phone"].ToString();
+                            employee.phone = (reader["phone"] == DBNull.Value) ? null : reader["phone"].ToString();
                             employee.SuperVisor = (reader["supervisorID"] == DBNull.Value) ? null : (int)reader["supervisorID"];
                             employee.IsAdmin = (bool)reader["isAdmin"];
-                            employee.DepartmentId =(int) reader["departmentID"];
+                            employee.DepartmentId = (reader["departmentID"] == DBNull.Value) ? null : (int)reader["departmentID"];
                             employee.Email = reader["Email"].ToString();
 
                         }
@@ -615,7 +665,160 @@ public class TaskManagerDAL
 
         return employee;
     }
+
+
+    public async void AddDepartment(department dep)// needs to check for duplicate entries
+    {
+        try
+        {
+            using (SqlConnection _connection = new SqlConnection(_connectionString))
+            {
+                _connection.OpenAsync();
+                string cmdString = "INSERT INTO Department (departmentName, headID) " +
+                    "VALUES (@name, @headID)";
+                using (SqlCommand cmd = new SqlCommand(cmdString, _connection))
+                {
+                    cmd.Parameters.AddWithValue("@name", dep.Name);
+                    cmd.Parameters.AddWithValue("@headID", dep.headID);
+
+                    await (cmd.ExecuteNonQueryAsync());
+
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("error adding comment: " + ex);
+        }
+    }
+    public List<Task_Manager.Models.department> GetDepartmentList()
+    {
+        List<Task_Manager.Models.department> departments = new List<Task_Manager.Models.department>();
+        using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+        {
+            sqlConnection.Open();
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM Department ", sqlConnection))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                int ID = reader.GetInt32(reader.GetOrdinal("departmentID"));
+                                string? name = reader["departmentName"].ToString();
+                                int headID = reader.GetInt32(reader.GetOrdinal("headID"));
+
+                                var department = new Task_Manager.Models.department(ID, name, headID);
+                                departments.Add(department);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("NO Departments");
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Something went wrong while fetching tasks table!");
+            }
+        }
+        return departments;
+    }
+
+    public async void UpdateDepartment(int id, int headID)
+    {
+        try
+        {
+            using (SqlConnection _connection = new SqlConnection(_connectionString))
+            {
+                await _connection.OpenAsync();
+                string cmdString = "UPDATE Department " +
+                    "SET headID = @headID " +
+                    "WHERE departmentID = @id";
+                using (SqlCommand cmd = new SqlCommand(cmdString, _connection))
+                {
+                    cmd.Parameters.AddWithValue("@headID", headID);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    // Asynchronously execute the query
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle the exception (you might want to log or rethrow it)
+            Console.WriteLine("Error while editing department: " + ex.ToString());
+            throw;
+        }
+    }
+
+    public async Task<List<DepartmentEmployee>> GetDepartmentEmployeeList()
+    {
+        List<DepartmentEmployee> depEmployeesList = new List<DepartmentEmployee>();
+        List<Task_Manager.Models.department> departments = GetDepartmentList(); // Make sure this method is synchronous or adapted to async if needed.
+
+        using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+        {
+            await sqlConnection.OpenAsync(); // Use OpenAsync for asynchronous opening of the connection
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("SELECT employeeID, fName, lName, email, phone " +
+                                                        "FROM Employee " +
+                                                        "WHERE departmentID = @Id", sqlConnection))
+                {
+                    foreach (var dep in departments)
+                    {
+                        DepartmentEmployee depEmployees = new DepartmentEmployee();
+                        depEmployees.Id = dep.Id;
+                        depEmployees.Name = dep.Name;
+                        depEmployees.Employees = new List<Employee>();
+
+                        cmd.Parameters.Clear(); 
+                        cmd.Parameters.AddWithValue("@Id", dep.Id);
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync()) 
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    Employee employee = new Employee();
+                                    employee.Id = reader.GetInt32(reader.GetOrdinal("employeeID"));
+                                    employee.FirstName = reader["fName"].ToString();
+                                    employee.LastName = reader["lName"].ToString();
+                                    employee.Email = reader["email"].ToString();
+                                    employee.phone = reader["phone"].ToString();
+
+                                    depEmployees.Employees.Add(employee);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("No employees found for department ID: " + dep.Id);
+                            }
+                        }
+                        depEmployeesList.Add(depEmployees);
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Something went wrong while fetching tasks table! " + ex.Message);
+            }
+        }
+        return depEmployeesList;
+    }
 }
+
+
 
 
 
