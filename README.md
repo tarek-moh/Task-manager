@@ -46,11 +46,9 @@ cd task-manager
 1. Open the appsettings.json file in the project root directory.
 2. Update the ConnectionStrings section to match your local SQL Server instance:
 ```bash
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=local;Database=TaskManagerDB;Trusted_Connection=True;MultipleActiveResultSets=true"
-  }
-}
+    "connectionStrings": {
+      "DefaultConnection": "Server=(localdb)\\local;Database=Task Manager;Trusted_Connection=true"
+    }
 ```
 -Replace localhost with your SQL Server instance name if it's different, such as (local)\SQLEXPRESS.
 ### 4. Running the Application
